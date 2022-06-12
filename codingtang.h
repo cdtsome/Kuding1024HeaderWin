@@ -691,7 +691,7 @@ const Color COLOR_BLACK = Color{ 0, 0, 0};
 const Color COLOR_CYAN = Color{ 0, 255, 255};
 
 // ´´½¨´°¿Ú
-void createConsole(const char* title) {
+void createConsole(const char* title, int w = 0, int h = 0) {
 	SetConsoleTitle(title);
 #ifdef WIN10
 	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
