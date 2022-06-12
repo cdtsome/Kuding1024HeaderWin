@@ -421,7 +421,7 @@ struct Window {
 			wc.style = CS_DBLCLKS;
 			RegisterClass(&wc);
 			hwnd = CreateWindowEx(0, "Codingtang Apps", "Codingtang App",
-			                      WS_VISIBLE | WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX,
+			                      WS_VISIBLE | (WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME ^ WS_MAXIMIZEBOX),
 			                      CW_USEDEFAULT, CW_USEDEFAULT, x, y, NULL, NULL, GetModuleHandle(NULL), NULL);
 			MSG msg;
 			while (GetMessage(&msg, NULL, 0, 0) > 0) {
