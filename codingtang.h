@@ -27,8 +27,8 @@ void log(const string& msg) {
 }
 
 struct Rect {
-	int x, y;       // ×ø±ê£¬x,y
-	int w, h;       // ¿í¸ß
+	int x, y;       // åæ ‡ï¼Œx,y
+	int w, h;       // å®½é«˜
 };
 typedef Rect rect_type;
 
@@ -49,7 +49,7 @@ typedef Point point_type;
 #define CDT_MOUSEBUTTONDOWN 2
 #define CDT_MOUSEBUTTONUP 3
 #define CDT_QUIT 114514
-
+ 
 #define CDT_KEY_0 '0'
 #define CDT_KEY_1 '1'
 #define CDT_KEY_2 '2'
@@ -170,8 +170,8 @@ typedef __int32 int32_t;
 
 struct MouseButtonEvent {
 	Uint32 type;   // CDT_MOUSEBUTTONDOWN or CDT_MOUSEBUTTONUP
-	Uint32 timestamp;   /**µ±Ç°Ê±¼ä,ºÁÃë */
-	Uint8 button;       /**< °´¼üË÷Òı,CDT_BUTTON_LEFT:×ó¼ü, CDT_BUTTON_RIGHT:ÓÒ¼ü */
+	Uint32 timestamp;   /**å½“å‰æ—¶é—´,æ¯«ç§’ */
+	Uint8 button;       /**< æŒ‰é”®ç´¢å¼•,CDT_BUTTON_LEFT:å·¦é”®, CDT_BUTTON_RIGHT:å³é”® */
 	Uint8 state;        /**< ::CDT_PRESSED or ::CDT_RELEASED */
 	Uint8 clicks;       /**< 1 for single-click, 2 for double-click, etc. */
 	Sint32 x;           /**< X coordinate, relative to window */
@@ -179,9 +179,9 @@ struct MouseButtonEvent {
 };
 
 struct Event {
-	Uint32 type;                // ÊÂ¼şÀàĞÍ
-	int32_t keyCode;            // °´¼ü
-	MouseButtonEvent button;    // °´Å¥ÊÂ¼ş
+	Uint32 type;                // äº‹ä»¶ç±»å‹
+	int32_t keyCode;            // æŒ‰é”®
+	MouseButtonEvent button;    // æŒ‰é’®äº‹ä»¶
 };
 
 namespace {
@@ -189,13 +189,13 @@ namespace {
 	mutex em;
 }
 
-// ×Ö·û´®×ªÎª¿í×Ö·û£¬ÎªÁË´òÓ¡µ¥¸öºº×Ö
+// å­—ç¬¦ä¸²è½¬ä¸ºå®½å­—ç¬¦ï¼Œä¸ºäº†æ‰“å°å•ä¸ªæ±‰å­—
 wstring toWstring(const string& str) {
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	return converter.from_bytes(str);
 }
 
-// ¿í×Ö·û×ªÎª×Ö·û´®
+// å®½å­—ç¬¦è½¬ä¸ºå­—ç¬¦ä¸²
 string toString(const wchar_t chr) {
 	wstring_convert<codecvt_utf8<wchar_t>> converter;
 	wstring wstr;
@@ -352,60 +352,60 @@ struct Window {
 		static clock_t lastPrint;
 		static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
 			switch (uMsg) {
-				case WM_DESTROY: //¹Ø±Õ
+				case WM_DESTROY: //å…³é—­
 					PostQuitMessage(0);
 					Gdiplus::GdiplusShutdown(m_gdiplusToken);
 					exit(0);
 					return 0;
-				case WM_LBUTTONDOWN: //×ó¼ü°´ÏÂ
+				case WM_LBUTTONDOWN: //å·¦é”®æŒ‰ä¸‹
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_LEFT, CDT_PRESSED, 1, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_LBUTTONUP: //×ó¼üÌ§Æğ
+				case WM_LBUTTONUP: //å·¦é”®æŠ¬èµ·
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_LEFT, CDT_RELEASED, 1, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_LBUTTONDBLCLK: //×ó¼üË«»÷
+				case WM_LBUTTONDBLCLK: //å·¦é”®åŒå‡»
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_LEFT, CDT_PRESSED, 2, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_RBUTTONDOWN: //ÓÒ¼ü°´ÏÂ
+				case WM_RBUTTONDOWN: //å³é”®æŒ‰ä¸‹
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_RIGHT, CDT_PRESSED, 1, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_RBUTTONUP: //ÓÒ¼üÌ§Æğ
+				case WM_RBUTTONUP: //å³é”®æŠ¬èµ·
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_RIGHT, CDT_RELEASED, 1, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_RBUTTONDBLCLK: //ÓÒ¼üË«»÷
+				case WM_RBUTTONDBLCLK: //å³é”®åŒå‡»
 					em.lock();
 					eq.push(Event{CDT_MOUSEBUTTONDOWN, 0,
 						{CDT_MOUSEBUTTONDOWN, 0, CDT_BUTTON_RIGHT, CDT_PRESSED, 2, GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)}});
 					em.unlock();
 					return 0;
-				case WM_KEYDOWN: //¼üÅÌ°´ÏÂ
+				case WM_KEYDOWN: //é”®ç›˜æŒ‰ä¸‹
 					em.lock();
 					eq.push(Event{CDT_KEYDOWN, int(wParam)});
 					em.unlock();
 					return 0;
-				case WM_KEYUP: //¼üÅÌÌ§Æğ
+				case WM_KEYUP: //é”®ç›˜æŠ¬èµ·
 					em.lock();
 					eq.push(Event{CDT_KEYUP, int(wParam)});
 					em.unlock();
 					return 0;
-				case WM_ERASEBKGND: //·ÀÖ¹ÖØ»æ±³¾°
+				case WM_ERASEBKGND: //é˜²æ­¢é‡ç»˜èƒŒæ™¯
 					return 0;
-				case WM_PAINT: //ÖØ»æ
+				case WM_PAINT: //é‡ç»˜
 					print(hwnd);
 					return 0;
 			}
@@ -438,12 +438,12 @@ struct Window {
 			msg.detach();
 		}
 
-		// ÉèÖÃ»­±ÊÑÕÉ«
+		// è®¾ç½®ç”»ç¬”é¢œè‰²
 		void drawColor(int r, int g, int b, int a) {
 			color = Color{r, g, b, a};
 		}
 
-		// »­Ò»¸öµã
+		// ç”»ä¸€ä¸ªç‚¹
 		void drawPoint(int x, int y) {
 			Items a;
 			a.Type = "Point";
@@ -456,7 +456,7 @@ struct Window {
 #endif
 		}
 
-		// »­Ò»ÌõÖ±Ïß
+		// ç”»ä¸€æ¡ç›´çº¿
 		void drawLine(int x1, int y1, int x2, int y2) {
 			Items a;
 			a.Type = "Line";
@@ -471,7 +471,7 @@ struct Window {
 #endif
 		}
 
-		// »­Ò»¸ö¾ØĞÎ
+		// ç”»ä¸€ä¸ªçŸ©å½¢
 		void fillRect(int x, int y, int w, int h) {
 			Items a;
 			a.Type = "Rect";
@@ -533,10 +533,10 @@ struct Window {
 		}
 
 		/*
-		* »­Í¼
-		* @param imgPath Í¼Æ¬Ãû³Æ
-		* @param src Í¼Æ¬ÒªäÖÈ¾µÄÇøÓò, NULL±íÊ¾Õû¸öÍ¼Æ¬
-		* @param dst ÆÁÄ»µÄÇøÓò,NULL±íÊ¾´Ó×óÉÏ½ÇäÖÈ¾Õû¸öÍ¼Æ¬
+		* ç”»å›¾
+		* @param imgPath å›¾ç‰‡åç§°
+		* @param src å›¾ç‰‡è¦æ¸²æŸ“çš„åŒºåŸŸ, NULLè¡¨ç¤ºæ•´ä¸ªå›¾ç‰‡
+		* @param dst å±å¹•çš„åŒºåŸŸ,NULLè¡¨ç¤ºä»å·¦ä¸Šè§’æ¸²æŸ“æ•´ä¸ªå›¾ç‰‡
 		*/
 		void drawImageEx(const char* imgPath, Rect* src, Rect* dst) {
 			Items a;
@@ -572,12 +572,12 @@ struct Window {
 		}
 
 		/*
-		* »­Í¼+Ğı×ª
-		* @param imgPath Í¼Æ¬Ãû³Æ
-		* @param src Í¼Æ¬ÒªäÖÈ¾µÄÇøÓò, NULL±íÊ¾Õû¸öÍ¼Æ¬
-		* @param dst ÆÁÄ»µÄÇøÓò,NULL±íÊ¾´Ó×óÉÏ½ÇäÖÈ¾Õû¸öÍ¼Æ¬
-		* @param angle Í¼Æ¬äÖÈ¾ÖÁÆÁÄ»ÒÔºó£¬Ğı×ªµÄ½Ç¶È
-		* @param center Í¼Æ¬Ğı×ªµÄÖĞĞÄµã£¬ÎªNULLÄ¬ÈÏÖĞĞÄµãÎªÊÇÍ¼Æ¬µÄ¿í¶È/2, Í¼Æ¬µÄ¸ß¶È/2
+		* ç”»å›¾+æ—‹è½¬
+		* @param imgPath å›¾ç‰‡åç§°
+		* @param src å›¾ç‰‡è¦æ¸²æŸ“çš„åŒºåŸŸ, NULLè¡¨ç¤ºæ•´ä¸ªå›¾ç‰‡
+		* @param dst å±å¹•çš„åŒºåŸŸ,NULLè¡¨ç¤ºä»å·¦ä¸Šè§’æ¸²æŸ“æ•´ä¸ªå›¾ç‰‡
+		* @param angle å›¾ç‰‡æ¸²æŸ“è‡³å±å¹•ä»¥åï¼Œæ—‹è½¬çš„è§’åº¦
+		* @param center å›¾ç‰‡æ—‹è½¬çš„ä¸­å¿ƒç‚¹ï¼Œä¸ºNULLé»˜è®¤ä¸­å¿ƒç‚¹ä¸ºæ˜¯å›¾ç‰‡çš„å®½åº¦/2, å›¾ç‰‡çš„é«˜åº¦/2
 		*/
 		void drawImageEx2(const char* imgPath, Rect* src, Rect* dst, double angle, Point* center) {
 
@@ -626,16 +626,16 @@ map<string, HBITMAP> Window::hbmps;
 clock_t Window::lastPrint = 0;
 mutex Window::im;
 
-// »ñÈ¡´°¿Ú´´½¨ÒÔºóµÄºÁÃëÊı
+// è·å–çª—å£åˆ›å»ºä»¥åçš„æ¯«ç§’æ•°
 clock_t st = clock();
 int getTicks() {
 	return clock() - st;
 }
 
 /*
- * ´´½¨Ò»¸ö´°¿Ú
- * width: ´°¿Ú¿í¶È
- * height: ´°¿Ú¸ß¶È
+ * åˆ›å»ºä¸€ä¸ªçª—å£
+ * width: çª—å£å®½åº¦
+ * height: çª—å£é«˜åº¦
  * */
 namespace {
 	bool __created__ = false;
@@ -690,7 +690,7 @@ const Color COLOR_WHITE = Color{ 255, 255, 255 };
 const Color COLOR_BLACK = Color{ 0, 0, 0};
 const Color COLOR_CYAN = Color{ 0, 255, 255};
 
-// ´´½¨´°¿Ú
+// åˆ›å»ºçª—å£
 void createConsole(const char* title) {
 	SetConsoleTitle(title);
 #ifdef WIN10
@@ -710,7 +710,7 @@ void createConsole(const char* title) {
 	system("color 0F");
 }
 
-// ÉèÖÃÎÄ×ÖÑÕÉ«
+// è®¾ç½®æ–‡å­—é¢œè‰²
 void setTextColor(const Color& color) {
 #ifdef WIN10
 	if (color.a == 0) {
@@ -720,7 +720,7 @@ void setTextColor(const Color& color) {
 #endif
 }
 
-// ÉèÖÃ±³¾°ÑÕÉ«
+// è®¾ç½®èƒŒæ™¯é¢œè‰²
 void setBackgroundColor(const Color& color) {
 #ifdef WIN10
 	if (color.a == 0) {
@@ -730,17 +730,17 @@ void setBackgroundColor(const Color& color) {
 #endif
 }
 
-// ĞİÃß
+// ä¼‘çœ 
 void sleep(int millionSeconds) {
 	Sleep(millionSeconds);
 }
 
-// ÇåÆÁ
+// æ¸…å±
 void cls() {
 	system("cls");
 }
 
-// ´òÓ¡
+// æ‰“å°
 void print(const char* str, ...) {
 	va_list v;
 	va_start(v, str);
@@ -748,12 +748,12 @@ void print(const char* str, ...) {
 	va_end(v);
 }
 
-// ´òÓ¡
+// æ‰“å°
 void print(const string& str) {
 	cout << str;
 }
 
-// ´òÓ¡
+// æ‰“å°
 void print(const wchar_t* str, ...) {
 	va_list v;
 	va_start(v, str);
@@ -761,14 +761,14 @@ void print(const wchar_t* str, ...) {
 	va_end(v);
 }
 
-// cinµÄ¸Ä°æ£¬»ñÈ¡int
+// cinçš„æ”¹ç‰ˆï¼Œè·å–int
 int getInt() {
 	int ret;
 	cin >> ret;
 	return ret;
 }
 
-// cinµÄ¸Ä°æ£¬»ñÈ¡sring
+// cinçš„æ”¹ç‰ˆï¼Œè·å–sring
 string getString() {
 	string ret;
 	cin >> ret;
@@ -776,14 +776,14 @@ string getString() {
 }
 
 /**
- * »ñÈ¡µ¥¸ö×Ö·û
- * @return »ñÈ¡µ¥¸ö×Ö·û
+ * è·å–å•ä¸ªå­—ç¬¦
+ * @return è·å–å•ä¸ªå­—ç¬¦
  */
 char getChar() {
 	return getchar();
 }
 
-// ½áÊø´°¿Ú
+// ç»“æŸçª—å£
 void quit() {
 	exit(0);
 }
