@@ -31,6 +31,7 @@ struct Rect {
 	int w, h;       // 宽高
 };
 typedef Rect rect_type;
+typedef Rect SDL_Rect;
 
 struct Color {
 	int r, g, b, a;
@@ -183,6 +184,7 @@ struct Event {
 	int32_t keyCode;            // 按键
 	MouseButtonEvent button;    // 按钮事件
 };
+typedef Event SDL_Event;
 
 namespace {
 	queue<Event> eq;
@@ -314,7 +316,11 @@ struct Window {
 					SelectObject(hdc, hFont);
 					SetTextColor(hdc, RGB(i.Item.TextEx.color.r, i.Item.TextEx.color.g, i.Item.TextEx.color.b));
 					SetBkColor(hdc, RGB(0, 0, 0));
+#ifdef OPAQUETEXT
+					SetBkMode(hdc, OPAQUE);
+#else
 					SetBkMode(hdc, TRANSPARENT);
+#endif
 					TextOut(hdc, i.Item.TextEx.x, i.Item.TextEx.y, i.Item.TextEx.text.c_str(), i.Item.TextEx.text.size());
 				} else if (i.Type == "Image") {
 					Gdiplus::Bitmap* bmp = bmps[i.Item.Image.imgPath];
@@ -732,6 +738,9 @@ void setBackgroundColor(const Color& color) {
 
 // 休眠
 void sleep(int millionSeconds) {
+	Sleep(millionSeconds);
+}
+void SDL_Delay(int millionSeconds) {
 	Sleep(millionSeconds);
 }
 
