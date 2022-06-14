@@ -280,9 +280,10 @@ struct Window {
 					SetPixel(hdc, i.Item.Point.x, i.Item.Point.y, RGB(i.color.r, i.color.g, i.color.b));
 				} else if (i.Type == "Line") {
 					HPEN gPen = CreatePen(PS_SOLID, 1, RGB(i.color.r, i.color.g, i.color.b));
-					HPEN oPen = (HPEN)SelectObject(hdc, gPen);
+					SelectObject(hdc, gPen);
 					MoveToEx(hdc, i.Item.Line.x1, i.Item.Line.y1, NULL);
 					LineTo(hdc, i.Item.Line.x2, i.Item.Line.y2);
+					DeleteObject(gPen);
 				} else if (i.Type == "Text") {
 					LOGFONT logfont;
 					ZeroMemory(&logfont, sizeof(LOGFONT));
