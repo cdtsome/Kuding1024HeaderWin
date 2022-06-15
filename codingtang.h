@@ -245,13 +245,16 @@ struct Window {
 					rect_type src;
 					rect_type dst;
 				} ImageEx;
-				struct ImageEx2 {
+				struct __ImageEx2 {
 					string imgPath;
 					rect_type src;
 					rect_type dst;
 					double angle;
 					point_type center;
-				};
+				} ImageEx2;
+				struct __Circle {
+					int x, y, r;
+				} Circle;
 			} Item;
 		};
 		static vector<Items>* items;
@@ -346,6 +349,15 @@ struct Window {
 						           i.Item.ImageEx.dst.h, hMemDC, i.Item.ImageEx.src.x, i.Item.ImageEx.src.y,
 						           min((int)sBmp.cx, i.Item.ImageEx.src.w), min((int)sBmp.cy, i.Item.ImageEx.src.h), bf);
 					}
+				} else if (i.Type == "Circle") {
+					HBRUSH hBrush = CreateSolidBrush(RGB(i.color.r, i.color.g, i.color.b));
+					SelectObject(hdc, hBrush);
+					HPEN hPen = CreatePen(PS_SOLID, 1, RGB(i.color.r, i.color.g, i.color.b));
+					SelectObject(hdc, hPen);
+					Ellipse(hdc, i.Item.Circle.x - i.Item.Circle.r, i.Item.Circle.y - i.Item.Circle.r,
+					        i.Item.Circle.x + i.Item.Circle.r, i.Item.Circle.y + i.Item.Circle.r);
+					DeleteObject(hPen);
+					DeleteObject(hBrush);
 				}
 			}
 
@@ -485,6 +497,18 @@ struct Window {
 			a.color = color;
 			a.Item.Rect.x = x, a.Item.Rect.y = y;
 			a.Item.Rect.w = w, a.Item.Rect.h = h;
+			items->push_back(a);
+#ifdef NOPRESENT
+			present();
+#endif
+		}
+
+		void fillCircle(int x, int y, int r) {
+			Items a;
+			a.Type = "Circle";
+			a.color = color;
+			a.Item.Circle.x = x, a.Item.Circle.y = y;
+			a.Item.Circle.r = r;
 			items->push_back(a);
 #ifdef NOPRESENT
 			present();
