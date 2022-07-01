@@ -326,6 +326,7 @@ struct Window {
 					SetBkMode(hdc, TRANSPARENT);
 #endif
 					TextOut(hdc, i.Item.TextEx.x, i.Item.TextEx.y, i.Item.TextEx.text.c_str(), i.Item.TextEx.text.size());
+					DeleteObject(hFont);
 				} else if (i.Type == "Image") {
 					Gdiplus::Bitmap* bmp = bmps[i.Item.Image.imgPath];
 					SIZE sBmp = {LONG(bmp->GetWidth()), LONG(bmp->GetHeight())};
